@@ -1,6 +1,6 @@
-# STAR RNA-seq aligner for Windows
-
 ![STAR RNA-seq aligner for Windows](assets/banner.png)
+
+# STAR RNA-seq aligner for Windows
 
 Community Windows build of the STAR RNA-seq aligner.
 
