@@ -48,7 +48,7 @@ star/
 
 Keep the DLL files in the same folder as `STAR.exe` and `STARlong.exe`.
 
-## Usage
+## Run STAR from PowerShell
 
 STAR is a command-line program. Open PowerShell, then move into the extracted
 `star` folder before running STAR:
@@ -83,6 +83,8 @@ Example short-read run:
   --readFilesIn .\reads_R1.fastq .\reads_R2.fastq `
   --outFileNamePrefix .\star_output\
 ```
+
+## Working with gzipped input files
 
 If your genome FASTA, annotation GTF, or FASTQ files are gzipped, use the
 included PowerShell wrapper script, `STAR-gz.ps1` (or `STARlong-gz.ps1` for
