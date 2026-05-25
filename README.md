@@ -1,12 +1,10 @@
 ![STAR RNA-seq aligner for Windows](assets/banner.png)
 
-# STAR RNA-seq aligner for Windows
+## STAR RNA-seq aligner for Windows: Community Build
 
-Community Windows build of the STAR RNA-seq aligner.
-
-This repository provides a STAR build that runs on Windows.
-The release archive includes `STAR.exe`, `STARlong.exe`, and all required MSYS2-MSYS runtime DLLs, so Windows users can use STAR
-without building it from source.
+This repository provides a STAR build that runs natively on Windows.
+The release archive includes `STAR.exe`, `STARlong.exe`, and all required MSYS2-MSYS runtime DLLs, which users can use 
+without building from source.
 
 This is **not an official STAR release**.  
 Official STAR repository: https://github.com/alexdobin/STAR
