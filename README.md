@@ -2,9 +2,8 @@
 
 Community Windows build of the STAR RNA-seq aligner.
 
-This repository provides a STAR build that runs in a Windows environment.
-The release archive includes `STAR.exe`, `STARlong.exe`, and the MSYS2-MSYS
-runtime DLLs required to run them outside MSYS2, so Windows users can use STAR
+This repository provides a STAR build that runs on Windows.
+The release archive includes `STAR.exe`, `STARlong.exe`, and all required MSYS2-MSYS runtime DLLs, so Windows users can use STAR
 without building it from source.
 
 This is **not an official STAR release**.  
@@ -19,7 +18,7 @@ This repository provides Windows executables for:
 
 built using [**MSYS2 MSYS**](https://www.msys2.org/docs/environments/).
 
-## Download prebuilt binaries
+## Download STAR for Windows
 
 Prebuilt Windows binaries are available from the
 [Releases](https://github.com/tus-kondolab/star-windows-build/releases) page
@@ -47,29 +46,38 @@ star/
 
 Keep the DLL files in the same folder as `STAR.exe` and `STARlong.exe`.
 
+STAR is a command-line program. Open PowerShell, then move into the extracted
+`star` folder before running STAR:
+
+```powershell
+# Replace this path with the folder where you extracted the ZIP file.
+# For example:
+cd C:\Users\your_name\Downloads\star
+```
+
 Check the version with:
 
-```bash
-./STAR.exe --version
-./STARlong.exe --version
+```powershell
+.\STAR.exe --version
+.\STARlong.exe --version
 ```
 
 Example short-read run:
 
-```bash
+```powershell
 # Generate a genome index.
-./STAR.exe --runThreadN 8 \
-  --runMode genomeGenerate \
-  --genomeDir ./genome_index \
-  --genomeFastaFiles ./reference.fa \
-  --sjdbGTFfile ./annotation.gtf \
+.\STAR.exe --runThreadN 8 `
+  --runMode genomeGenerate `
+  --genomeDir .\genome_index `
+  --genomeFastaFiles .\reference.fa `
+  --sjdbGTFfile .\annotation.gtf `
   --sjdbOverhang 100
 
 # Map paired-end short reads.
-./STAR.exe --runThreadN 8 \
-  --genomeDir ./genome_index \
-  --readFilesIn ./reads_R1.fastq ./reads_R2.fastq \
-  --outFileNamePrefix ./star_output/
+.\STAR.exe --runThreadN 8 `
+  --genomeDir .\genome_index `
+  --readFilesIn .\reads_R1.fastq .\reads_R2.fastq `
+  --outFileNamePrefix .\star_output\
 ```
 
 ## Important Limitations
