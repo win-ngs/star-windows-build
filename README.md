@@ -3,8 +3,7 @@
 ## STAR RNA-seq aligner for Windows: Community Build
 
 This repository provides a STAR build that runs natively on Windows.
-The release archive includes `STAR.exe`, `STARlong.exe`, and all required MSYS2-MSYS runtime DLLs, which users can use 
-without building from source.
+The release archive includes pre-compiled STAR binaries that users can use without building from source.
 
 This is **not an official STAR release**.  
 Official STAR repository: https://github.com/alexdobin/STAR
@@ -139,9 +138,10 @@ speed, STAR parameters, read length, and input data.
 
 Validation environment:
 
-- CPU: Intel Core i9-12900K
-- Memory: 64 GB DDR4
-- Storage: 2 TB SSD
+- CPU: Intel Core i9-12900K (16 cores, 24 threads)
+- Memory: 64GB DDR4
+- Storage: 2TB SSD
+- OS: Windows 11 Pro
 
 Test data:
 
