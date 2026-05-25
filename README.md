@@ -1,38 +1,48 @@
-# STAR Windows Build
+# STAR RNA-seq aligner for Windows
 
 Community Windows build of the STAR RNA-seq aligner.
+
+This repository provides a STAR build that runs in a Windows environment.
+The release archive includes `STAR.exe`, `STARlong.exe`, and the MSYS2-MSYS
+runtime DLLs required to run them outside MSYS2, so Windows users can use STAR
+without building it from source.
 
 This is **not an official STAR release**.  
 Official STAR repository: https://github.com/alexdobin/STAR
 
+This build is based on upstream STAR 2.7.11b.
+
 This repository provides Windows executables for:
 
-- `STAR.exe`
-- `STARlong.exe`
+- `STAR.exe` for standard short-read alignment
+- `STARlong.exe` for long-read alignment
 
-built using **MSYS2-MSYS**.
+built using [**MSYS2 MSYS**](https://www.msys2.org/docs/environments/).
 
 ## Download prebuilt binaries
 
-Prebuilt Windows binaries are available from the **Releases** page of this repository.
+Prebuilt Windows binaries are available from the
+[Releases](https://github.com/tus-kondolab/star-windows-build/releases) page
+of this repository.
 
 Download the latest release archive, for example:
 
 ```text
-STAR-windows-x86_64-msys.zip
+STAR-2.7.11b-windows-x86_64-msys.zip
 ```
 
 After extracting the archive, you should see:
 
 ```text
-STAR.exe
-STARlong.exe
-msys-2.0.dll
-msys-z.dll
-msys-gcc_s-seh-1.dll
-msys-gomp-1.dll
-msys-stdc++-6.dll
-THIRD_PARTY_NOTICES.txt
+star/
+  STAR.exe
+  STARlong.exe
+  msys-2.0.dll
+  msys-z.dll
+  msys-gcc_s-seh-1.dll
+  msys-gomp-1.dll
+  msys-stdc++-6.dll
+  THIRD_PARTY_NOTICES.txt
 ```
 
 Keep the DLL files in the same folder as `STAR.exe` and `STARlong.exe`.
@@ -43,6 +53,37 @@ Check the version with:
 ./STAR.exe --version
 ./STARlong.exe --version
 ```
+
+Example short-read run:
+
+```bash
+# Generate a genome index.
+./STAR.exe --runThreadN 8 \
+  --runMode genomeGenerate \
+  --genomeDir ./genome_index \
+  --genomeFastaFiles ./reference.fa \
+  --sjdbGTFfile ./annotation.gtf \
+  --sjdbOverhang 100
+
+# Map paired-end short reads.
+./STAR.exe --runThreadN 8 \
+  --genomeDir ./genome_index \
+  --readFilesIn ./reads_R1.fastq ./reads_R2.fastq \
+  --outFileNamePrefix ./star_output/
+```
+
+## Important Limitations
+
+Do not use `--readFilesCommand` with this Windows release.
+
+Compressed read files such as `.fastq.gz` and `.fq.gz` are not supported. STAR
+handles compressed input by running an external command such as `zcat` or
+`gzip -cd` through `--readFilesCommand`, using FIFO files and generated command
+scripts internally. This POSIX-style command pipeline is not reliable in this
+MSYS2-MSYS Windows build.
+
+Decompress reads before running STAR, and use uncompressed `.fastq` or `.fq`
+files as input.
 
 ## Runtime DLLs included in the release archive
 
@@ -60,17 +101,17 @@ These DLLs are required to run the MSYS2-MSYS build of `STAR.exe` and `STARlong.
 
 The DLLs are redistributed unmodified from MSYS2 packages.
 
-License information for these bundled DLLs is provided in:
-
-```text
-THIRD_PARTY_NOTICES.txt
-```
+License information for these bundled DLLs is provided in
+[THIRD_PARTY_NOTICES.txt](THIRD_PARTY_NOTICES.txt).
 
 ## Build from source
 
 This section is for users who want to build `STAR.exe` and `STARlong.exe` themselves.
 
-Open **MSYS2 MSYS**.
+Install [**MSYS2**](https://www.msys2.org/), then open the **MSYS2-MSYS** terminal by selecting **MSYS2-MSYS** from the Windows Start menu.
+
+Use the **MSYS2-MSYS** environment, **not MSYS2-UCRT64** or any other
+MSYS2 environment.
 
 Update MSYS2:
 
@@ -78,7 +119,7 @@ Update MSYS2:
 pacman -Syu
 ```
 
-If MSYS2 asks you to close the terminal, close it, reopen **MSYS2 MSYS**, and run again:
+If MSYS2 asks you to close the terminal, close it, reopen **MSYS2-MSYS**, and run again:
 
 ```bash
 pacman -Syu
@@ -87,7 +128,7 @@ pacman -Syu
 Install the required build tools:
 
 ```bash
-pacman -S --needed git make gcc zlib-devel vim
+pacman -S --needed base-devel git gcc zlib-devel vim
 ```
 
 `vim` provides `xxd`, which is required by the STAR Makefile.
@@ -175,7 +216,7 @@ See the official STAR repository for the original source code and license inform
 https://github.com/alexdobin/STAR
 
 The release archive also includes MSYS2-MSYS runtime DLLs.  
-See `THIRD_PARTY_NOTICES.txt` for third-party package and license information.
+See [THIRD_PARTY_NOTICES.txt](THIRD_PARTY_NOTICES.txt) for third-party package and license information.
 
 ## Disclaimer
 
