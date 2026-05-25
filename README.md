@@ -1,5 +1,7 @@
 # STAR RNA-seq aligner for Windows
 
+![STAR RNA-seq aligner for Windows](assets/banner.png)
+
 Community Windows build of the STAR RNA-seq aligner.
 
 This repository provides a STAR build that runs on Windows.
