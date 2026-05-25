@@ -41,6 +41,8 @@ star/
   msys-gcc_s-seh-1.dll
   msys-gomp-1.dll
   msys-stdc++-6.dll
+  STAR-gz.ps1
+  STARlong-gz.ps1
   THIRD_PARTY_NOTICES.txt
 ```
 
@@ -80,18 +82,91 @@ Example short-read run:
   --outFileNamePrefix .\star_output\
 ```
 
+If your genome FASTA, annotation GTF, or FASTQ files are gzipped, use the
+included PowerShell wrapper script, `STAR-gz.ps1` (or `STARlong-gz.ps1` for
+STARlong). The wrapper temporarily decompresses `.gz` files listed after
+`--genomeFastaFiles`, `--sjdbGTFfile`, or `--readFilesIn`, runs STAR with the
+decompressed files, and removes the temporary files after STAR exits.
+Non-gzipped files can be mixed with gzipped files; they are passed to STAR
+unchanged.
+
+```powershell
+# Generate a genome index from gzipped and uncompressed input files.
+.\STAR-gz.ps1 --runThreadN 8 `
+  --runMode genomeGenerate `
+  --genomeDir .\genome_index `
+  --genomeFastaFiles .\reference.fa.gz .\extra_reference.fa `
+  --sjdbGTFfile .\annotation.gtf.gz `
+  --sjdbOverhang 100
+```
+
+```powershell
+# Map paired-end gzipped short reads.
+.\STAR-gz.ps1 --runThreadN 8 `
+  --genomeDir .\genome_index `
+  --readFilesIn .\reads_R1.fastq.gz .\reads_R2.fastq.gz `
+  --outFileNamePrefix .\star_output\
+```
+
+Temporary decompressed files can be large. To place them on a specific drive,
+use `-TempDir`:
+
+```powershell
+.\STAR-gz.ps1 -TempDir D:\star_tmp --runThreadN 8 `
+  --genomeDir .\genome_index `
+  --readFilesIn .\reads_R1.fastq.gz .\reads_R2.fastq.gz `
+  --outFileNamePrefix .\star_output\
+```
+
+For long-read alignment, use `STARlong-gz.ps1` in the same way:
+
+```powershell
+.\STARlong-gz.ps1 --runThreadN 8 `
+  --genomeDir .\genome_index `
+  --readFilesIn .\long_reads.fastq.gz `
+  --outFileNamePrefix .\starlong_output\
+```
+
+## Performance Reference
+
+The following timings are from our validation environment and are provided as a
+rough reference only. Actual runtime depends on the number of threads, storage
+speed, STAR parameters, read length, and input data.
+
+Validation environment:
+
+- CPU: Intel Core i9-12900K
+- Memory: 64 GB DDR4
+- Storage: 2 TB SSD
+
+Test data:
+
+- Genome FASTA: `GRCh38.p14.genome.fa`
+- Annotation GTF: `gencode.v49.primary_assembly.annotation.gtf`
+- Mapping input: `SRR33370091` (~20 million reads, 150 bp paired-end)
+
+Observed runtimes:
+
+- Genome index generation for GRCh38: 50 minutes
+- Mapping, including sorted-by-coordinate BAM output: 3 minutes 18 seconds
+
 ## Important Limitations
 
 Do not use `--readFilesCommand` with this Windows release.
 
-Compressed read files such as `.fastq.gz` and `.fq.gz` are not supported. STAR
-handles compressed input by running an external command such as `zcat` or
-`gzip -cd` through `--readFilesCommand`, using FIFO files and generated command
-scripts internally. This POSIX-style command pipeline is not reliable in this
-MSYS2-MSYS Windows build.
+STAR handles compressed read input by running an external command such as
+`zcat` or `gzip -cd` through `--readFilesCommand`, using FIFO files and
+generated command scripts internally. This POSIX-style command pipeline is not
+reliable in this MSYS2-MSYS Windows build.
 
-Decompress reads before running STAR, and use uncompressed `.fastq` or `.fq`
-files as input.
+Use `STAR-gz.ps1` instead. It works around this limitation by temporarily
+decompressing gzipped input files before running `STAR.exe`. For long-read
+alignment, use `STARlong-gz.ps1`.
+
+STAR also expects genome FASTA files passed to `--genomeFastaFiles` and
+annotation files passed to `--sjdbGTFfile` to be plain text. For `.fa.gz`,
+`.fasta.gz`, `.gtf.gz`, `.fastq.gz`, or `.fq.gz` files, use `STAR-gz.ps1`,
+`STARlong-gz.ps1`, or decompress the files manually before running STAR.
 
 ## Runtime DLLs included in the release archive
 
@@ -147,12 +222,15 @@ Build both STAR and STARlong:
 make
 ```
 
-The executables will be copied to:
+The build outputs and helper files will be copied to:
 
 ```text
 win_x86_64/
   STAR.exe
   STARlong.exe
+  STAR-gz.ps1
+  STARlong-gz.ps1
+  THIRD_PARTY_NOTICES.txt
 ```
 
 Clean build outputs:
@@ -210,7 +288,7 @@ The top-level `Makefile`:
 3. changes `-std=c++11` to `-std=gnu++11` in the copied Makefiles
 4. passes `-DSHM_NORESERVE=0` via `CXXFLAGSextra`
 5. builds `STAR` and `STARlong` separately
-6. copies the final executables to `win_x86_64/`
+6. copies the final executables and helper files to `win_x86_64/`
 
 Building `STAR` and `STARlong` in separate directories avoids mixing object files compiled with different build options.
 

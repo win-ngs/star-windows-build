@@ -29,6 +29,7 @@ dist: star starlong
 	mkdir -p $(DIST_DIR)
 	cp $(BUILD_STAR)/source/STAR.exe $(DIST_DIR)/
 	cp $(BUILD_STARLONG)/source/STARlong.exe $(DIST_DIR)/
+	cp STAR-gz.ps1 STARlong-gz.ps1 THIRD_PARTY_NOTICES.txt $(DIST_DIR)/
 
 clean:
 	rm -rf $(BUILD_ROOT) $(DIST_DIR)
