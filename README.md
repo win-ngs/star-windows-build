@@ -48,6 +48,8 @@ star/
 
 Keep the DLL files in the same folder as `STAR.exe` and `STARlong.exe`.
 
+## Usage
+
 STAR is a command-line program. Open PowerShell, then move into the extracted
 `star` folder before running STAR:
 
