@@ -145,32 +145,34 @@ Validation environment:
 
 Test data:
 
-- Genome FASTA: `GRCh38.p14.genome.fa`
+- Genome FASTA: `GRCh38.primary_assembly.genome.fa`
 - Annotation GTF: `gencode.v49.primary_assembly.annotation.gtf`
 - Mapping input: `SRR33370091` (~20 million reads, 150 bp paired-end)
 
 Observed runtimes:
 
-- Genome index generation for GRCh38: 50 minutes
-- Mapping, including sorted-by-coordinate BAM output: 3 minutes 18 seconds
+- Genome index generation for GRCh38: 31 minutes 31 seconds.
+- Mapping, including sorted-by-coordinate BAM output: 3 minutes 4 seconds (426.12 million of reads per hour)
 
 ## Important Limitations
 
-Do not use `--readFilesCommand` with this Windows release.
+Do not use `--readFilesCommand` to read gzip-compressed files with this Windows release.
 
-STAR handles compressed read input by running an external command such as
-`zcat` or `gzip -cd` through `--readFilesCommand`, using FIFO files and
-generated command scripts internally. This POSIX-style command pipeline is not
-reliable in this MSYS2-MSYS Windows build.
+STAR implements this option by creating POSIX FIFO files and temporary shell scripts, such as `gzip -cd "reads.fastq.gz" > FIFO`. This depends on Unix-style shell behavior and FIFO support, which are not reliable in the MSYS2-MSYS Windows build.
 
-Use `STAR-gz.ps1` instead. It works around this limitation by temporarily
-decompressing gzipped input files before running `STAR.exe`. For long-read
-alignment, use `STARlong-gz.ps1`.
+Also avoid giving multiple FASTQ files for one mate as a comma-separated list,
+such as `--readFilesIn R1_L001.fastq,R1_L002.fastq R2_L001.fastq,R2_L002.fastq`.
+STAR internally uses `cat` in this case, which goes through the same FIFO and
+temporary shell script path. If reads are split across lanes or chunks, combine
+them into one R1 file and one R2 file before running STAR.
 
-STAR also expects genome FASTA files passed to `--genomeFastaFiles` and
-annotation files passed to `--sjdbGTFfile` to be plain text. For `.fa.gz`,
-`.fasta.gz`, `.gtf.gz`, `.fastq.gz`, or `.fq.gz` files, use `STAR-gz.ps1`,
-`STARlong-gz.ps1`, or decompress the files manually before running STAR.
+For gzipped input files, use `STAR-gz.ps1` or `STARlong-gz.ps1` instead. These
+wrapper scripts work around this limitation by temporarily decompressing
+gzipped input files before running `STAR.exe` or `STARlong.exe`.
+
+In addition, `STAR-gz.ps1` and `STARlong-gz.ps1` can accept gzipped genome
+FASTA and annotation GTF files for `--genomeFastaFiles` and `--sjdbGTFfile`.
+This is not supported directly by the original STAR command-line options.
 
 ## Runtime DLLs included in the release archive
 
