@@ -1,6 +1,6 @@
 ![STAR RNA-seq aligner for Windows](assets/banner.png)
 
-## STAR RNA-seq aligner for Windows: Community Build
+## STAR RNA-seq aligner for Windows: Community-built Windows binaries
 
 This repository provides a STAR build that runs natively on Windows.
 The release archive includes pre-compiled STAR binaries that users can use without building from source.
@@ -15,9 +15,9 @@ This repository provides Windows executables for:
 - `STAR.exe` for standard short-read alignment
 - `STARlong.exe` for long-read alignment
 
-built using [**MSYS2 MSYS**](https://www.msys2.org/docs/environments/).
+built using [MSYS2 MSYS](https://www.msys2.org/docs/environments/).
 
-## Download STAR for Windows
+## Downloading STAR for Windows
 
 Prebuilt Windows binaries are available from the
 [Releases](https://github.com/tus-kondolab/star-windows-build/releases) page
@@ -47,7 +47,7 @@ star/
 
 Keep the DLL files in the same folder as `STAR.exe` and `STARlong.exe`.
 
-## Run STAR from PowerShell
+## Running STAR from PowerShell
 
 STAR is a command-line program. Open PowerShell, then move into the extracted
 `star` folder before running STAR:
@@ -56,13 +56,6 @@ STAR is a command-line program. Open PowerShell, then move into the extracted
 # Replace this path with the folder where you extracted the ZIP file.
 # For example:
 cd C:\Users\your_name\Downloads\star
-```
-
-Check the version with:
-
-```powershell
-.\STAR.exe --version
-.\STARlong.exe --version
 ```
 
 Example short-read run:
@@ -85,13 +78,19 @@ Example short-read run:
 
 ## Working with gzipped input files
 
-If your genome FASTA, annotation GTF, or FASTQ files are gzipped, use the
-included PowerShell wrapper script, `STAR-gz.ps1` (or `STARlong-gz.ps1` for
-STARlong). The wrapper temporarily decompresses `.gz` files listed after
-`--genomeFastaFiles`, `--sjdbGTFfile`, or `--readFilesIn`, runs STAR with the
-decompressed files, and removes the temporary files after STAR exits.
-Non-gzipped files can be mixed with gzipped files; they are passed to STAR
+The STAR binaries in this Windows release cannot read gzip-compressed input
+files directly; see [Limitations](#limitations). If your genome FASTA,
+annotation GTF, or FASTQ files are gzipped, use the included PowerShell wrapper
+scripts: `STAR-gz.ps1` for `STAR.exe`, or `STARlong-gz.ps1` for
+`STARlong.exe`. These wrappers temporarily decompress `.gz` files passed to
+`--genomeFastaFiles`, `--sjdbGTFfile`, or `--readFilesIn`, run STAR with the
+decompressed files, and remove the temporary files after STAR exits.
+Non-gzipped files can be used alongside gzipped files; they are passed to STAR
 unchanged.
+
+Use one FASTQ file per mate with these wrappers. If your reads are split across
+lanes or chunks, combine them before running STAR; see
+[Limitations](#limitations).
 
 ```powershell
 # Generate a genome index from gzipped and uncompressed input files.
@@ -130,11 +129,10 @@ For long-read alignment, use `STARlong-gz.ps1` in the same way:
   --outFileNamePrefix .\starlong_output\
 ```
 
-## Performance Reference
+## Performance
 
 The following timings are from our validation environment and are provided as a
-rough reference only. Actual runtime depends on the number of threads, storage
-speed, STAR parameters, read length, and input data.
+rough reference only.
 
 Validation environment:
 
@@ -151,24 +149,29 @@ Test data:
 
 Observed runtimes:
 
-- Genome index generation for GRCh38: 31 minutes 31 seconds.
-- Mapping, including sorted-by-coordinate BAM output: 3 minutes 4 seconds (426.12 million of reads per hour)
+- Genome index generation: **31 min 31 sec**.
+- Mapping, including sorted-by-coordinate BAM output: **3 min 4 sec (426.12 million reads/hour)**
 
-## Important Limitations
+## Limitations
 
-Do not use `--readFilesCommand` to read gzip-compressed files with this Windows release.
+Do not use `--readFilesCommand` with this Windows release.
 
-STAR implements this option by creating POSIX FIFO files and temporary shell scripts, such as `gzip -cd "reads.fastq.gz" > FIFO`. This depends on Unix-style shell behavior and FIFO support, which are not reliable in the MSYS2-MSYS Windows build.
+STAR implements `--readFilesCommand` by creating POSIX FIFO files and temporary
+shell scripts, such as `gzip -cd "reads.fastq.gz" > FIFO`. This depends on
+Unix-style shell behavior and FIFO support, which are not reliable in the
+MSYS2-MSYS Windows build.
 
 Also avoid giving multiple FASTQ files for one mate as a comma-separated list,
 such as `--readFilesIn R1_L001.fastq,R1_L002.fastq R2_L001.fastq,R2_L002.fastq`.
-STAR internally uses `cat` in this case, which goes through the same FIFO and
-temporary shell script path. If reads are split across lanes or chunks, combine
-them into one R1 file and one R2 file before running STAR.
+When multiple files are provided this way, STAR internally uses `cat`, which
+goes through the same FIFO and temporary shell script path. If reads are split
+across lanes or chunks, combine them into one R1 file and one R2 file before
+running STAR.
 
-For gzipped input files, use `STAR-gz.ps1` or `STARlong-gz.ps1` instead. These
-wrapper scripts work around this limitation by temporarily decompressing
-gzipped input files before running `STAR.exe` or `STARlong.exe`.
+For gzipped input files, use `STAR-gz.ps1` or `STARlong-gz.ps1` instead of
+`--readFilesCommand`. These wrapper scripts avoid STAR's `--readFilesCommand`
+path by temporarily decompressing gzipped input files before running `STAR.exe`
+or `STARlong.exe`.
 
 In addition, `STAR-gz.ps1` and `STARlong-gz.ps1` can accept gzipped genome
 FASTA and annotation GTF files for `--genomeFastaFiles` and `--sjdbGTFfile`.
