@@ -1,4 +1,4 @@
-![STAR RNA-seq aligner for Windows](assets/banner.png)
+![STAR RNA-seq aligner for Windows](assets/banner.jpg)
 
 ## STAR RNA-seq aligner for Windows: Community-built Windows binaries
 
@@ -20,7 +20,7 @@ built using [MSYS2 MSYS](https://www.msys2.org/docs/environments/).
 ## Downloading STAR for Windows
 
 Prebuilt Windows binaries are available from the
-[Releases](https://github.com/tus-kondolab/star-windows-build/releases) page
+[Releases](https://github.com/win-ngs/star-windows-build/releases) page
 of this repository.
 
 Download the latest release archive, for example:
@@ -49,8 +49,11 @@ Keep the DLL files in the same folder as `STAR.exe` and `STARlong.exe`.
 
 ## Running STAR from PowerShell
 
-STAR is a command-line program. Open PowerShell, then move into the extracted
-`star` folder before running STAR:
+STAR is a command-line program; the examples below show a minimal Windows workflow.
+For detailed usage and options, refer to the
+[official STAR documentation](https://github.com/alexdobin/STAR/blob/master/doc/STARmanual.pdf).
+
+Open PowerShell, then move into the extracted `star` folder before running STAR:
 
 ```powershell
 # Replace this path with the folder where you extracted the ZIP file.
