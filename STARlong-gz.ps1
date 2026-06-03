@@ -18,10 +18,18 @@ param(
 Set-StrictMode -Version 2.0
 $ErrorActionPreference = "Stop"
 
-$wrapper = Join-Path $PSScriptRoot "STAR-gz.ps1"
-$starLong = Join-Path $PSScriptRoot "STARlong.exe"
+$scriptDir = if (-not [string]::IsNullOrWhiteSpace($PSScriptRoot)) {
+    $PSScriptRoot
+} elseif (-not [string]::IsNullOrWhiteSpace($PSCommandPath)) {
+    Split-Path -Parent $PSCommandPath
+} else {
+    (Get-Location).Path
+}
+
+$wrapper = Join-Path $scriptDir "STAR-gz.ps1"
+$starLong = Join-Path $scriptDir "STARlong.exe"
 if (-not (Test-Path -LiteralPath $starLong -PathType Leaf)) {
-    $repoBuildPath = Join-Path $PSScriptRoot "win_x86_64\STARlong.exe"
+    $repoBuildPath = Join-Path $scriptDir "win_x86_64\STARlong.exe"
     if (Test-Path -LiteralPath $repoBuildPath -PathType Leaf) {
         $starLong = $repoBuildPath
     }

@@ -11,7 +11,7 @@ temporary files after STAR exits.
 
 [CmdletBinding()]
 param(
-    [string]$StarExe = (Join-Path $PSScriptRoot "STAR.exe"),
+    [string]$StarExe,
     [string]$TempDir,
     [switch]$KeepTemp,
     [Parameter(ValueFromRemainingArguments = $true)]
@@ -20,6 +20,18 @@ param(
 
 Set-StrictMode -Version 2.0
 $ErrorActionPreference = "Stop"
+
+$script:ScriptDir = if (-not [string]::IsNullOrWhiteSpace($PSScriptRoot)) {
+    $PSScriptRoot
+} elseif (-not [string]::IsNullOrWhiteSpace($PSCommandPath)) {
+    Split-Path -Parent $PSCommandPath
+} else {
+    (Get-Location).Path
+}
+
+if ([string]::IsNullOrWhiteSpace($StarExe)) {
+    $StarExe = Join-Path $script:ScriptDir "STAR.exe"
+}
 
 function Write-Info {
     param([string]$Message)
@@ -46,7 +58,7 @@ function Resolve-StarExecutable {
 
     $resolved = [System.IO.Path]::GetFullPath($Path)
     if (-not (Test-Path -LiteralPath $resolved -PathType Leaf) -and [System.IO.Path]::GetFileName($Path) -eq "STAR.exe") {
-        $repoBuildPath = Join-Path $PSScriptRoot "win_x86_64\STAR.exe"
+        $repoBuildPath = Join-Path $script:ScriptDir "win_x86_64\STAR.exe"
         if (Test-Path -LiteralPath $repoBuildPath -PathType Leaf) {
             $resolved = [System.IO.Path]::GetFullPath($repoBuildPath)
         }

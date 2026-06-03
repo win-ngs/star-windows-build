@@ -38,12 +38,11 @@ win-ngs-STAR-2.7.11b-windows-x86_64-msys.msi
 </table>
 
 Download the MSI file and double-click it to install STAR. The installer places
-STAR under `C:\Program Files\WinNGS\STAR` and adds `C:\Program Files\WinNGS\bin`
-to PATH. Open a new PowerShell window after installation, then run `STAR` or
-`STARlong`.
+STAR under `C:\Program Files\WinNGS-STAR` and adds that folder to PATH. Open a
+new PowerShell window after installation, then run `STAR` or `STARlong`.
 
 If Windows shows a blue warning screen titled "Windows protected your PC", 
-click the **More info** link, then click **Run anyway** button to continue 
+click the **More info** link, then click the **Run anyway** button to continue 
 the installation.
 
 If the MSI cannot be installed on your system, or if you prefer not to use an
