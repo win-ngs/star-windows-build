@@ -5,14 +5,6 @@
 This repository provides a STAR build that runs natively on Windows.
 The release archive includes pre-compiled STAR binaries that users can use without building from source.
 
-<table align="center">
-  <tr>
-    <td align="center">
-      <a href="https://github.com/win-ngs/star-windows-build/releases/download/v2.7.11b-windows/win-ngs-STAR-2.7.11b-windows-x86_64-msys.msi"><strong>Download Installer</strong></a> 
-    </td>
-  </tr>
-</table>
-
 This is **not an official STAR release**.  
 Official STAR repository: https://github.com/alexdobin/STAR
 
@@ -37,13 +29,22 @@ Recommended installer:
 win-ngs-STAR-2.7.11b-windows-x86_64-msys.msi
 ```
 
+<table align="center">
+  <tr>
+    <td align="center">
+      <a href="https://github.com/win-ngs/star-windows-build/releases/download/v2.7.11b-windows/win-ngs-STAR-2.7.11b-windows-x86_64-msys.msi"><strong>Download Installer</strong></a> 
+    </td>
+  </tr>
+</table>
+
 Download the MSI file and double-click it to install STAR. The installer places
 STAR under `C:\Program Files\WinNGS\STAR` and adds `C:\Program Files\WinNGS\bin`
 to PATH. Open a new PowerShell window after installation, then run `STAR` or
 `STARlong`.
 
-If Windows shows a blue warning screen, click **More info**, then 
-choose **Run anyway** to continue the installation.
+If Windows shows a blue warning screen titled "Windows protected your PC", 
+click the **More info** link, then click **Run anyway** button to continue 
+the installation.
 
 If the MSI cannot be installed on your system, or if you prefer not to use an
 installer, download the portable ZIP package instead:
