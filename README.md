@@ -11,7 +11,7 @@ The release archive includes pre-compiled STAR binaries that users can use witho
       <a href="https://github.com/win-ngs/star-windows-build/releases/download/v2.7.11b-windows/win-ngs-STAR-2.7.11b-windows-x86_64-msys.msi"><strong>Download Installer</strong></a> 
     </td>
   </tr>
-</table>*See instructions below.
+</table>
 
 This is **not an official STAR release**.  
 Official STAR repository: https://github.com/alexdobin/STAR
@@ -42,9 +42,8 @@ STAR under `C:\Program Files\WinNGS\STAR` and adds `C:\Program Files\WinNGS\bin`
 to PATH. Open a new PowerShell window after installation, then run `STAR` or
 `STARlong`.
 
-The MSI is currently unsigned. If Windows shows a blue SmartScreen warning
-screen, click **More info**, then choose **Run anyway** to continue the
-installation.
+If Windows shows a blue warning screen, click **More info**, then 
+choose **Run anyway** to continue the installation.
 
 If the MSI cannot be installed on your system, or if you prefer not to use an
 installer, download the portable ZIP package instead:
@@ -79,19 +78,23 @@ STAR is a command-line program; the examples below show a minimal Windows workfl
 For detailed usage and options, refer to the
 [official STAR documentation](https://github.com/alexdobin/STAR/blob/master/doc/STARmanual.pdf).
 
-Open PowerShell, then move into the extracted folder before running STAR:
+If you installed STAR with the MSI installer, open a new PowerShell window.
+The `STAR` and `STARlong` commands are available from any working directory:
 
 ```powershell
-# Replace this path with the folder where you extracted the ZIP file.
-# For example:
-cd C:\Users\your_name\Downloads\star-2.7.11b-windows-x86_64-msys
+STAR --version
+STARlong --version
 ```
+
+If you are using the portable ZIP package instead, open PowerShell, move into
+the extracted folder, and replace `STAR` with `.\STAR.exe` and `STARlong` with
+`.\STARlong.exe` in the examples below.
 
 Example short-read run:
 
 ```powershell
 # Generate a genome index.
-.\STAR.exe --runThreadN 8 `
+STAR --runThreadN 8 `
   --runMode genomeGenerate `
   --genomeDir .\genome_index `
   --genomeFastaFiles .\reference.fa `
@@ -99,7 +102,7 @@ Example short-read run:
   --sjdbOverhang 100
 
 # Map paired-end short reads.
-.\STAR.exe --runThreadN 8 `
+STAR --runThreadN 8 `
   --genomeDir .\genome_index `
   --readFilesIn .\reads_R1.fastq .\reads_R2.fastq `
   --outFileNamePrefix .\star_output\
@@ -110,10 +113,12 @@ Example short-read run:
 The STAR binaries in this Windows release cannot read gzip-compressed input
 files directly; see [Limitations](#limitations). If your genome FASTA,
 annotation GTF, or FASTQ files are gzipped, use the included PowerShell wrapper
-scripts: `STAR-gz.ps1` for `STAR.exe`, or `STARlong-gz.ps1` for
-`STARlong.exe`. These wrappers temporarily decompress `.gz` files passed to
-`--genomeFastaFiles`, `--sjdbGTFfile`, or `--readFilesIn`, run STAR with the
-decompressed files, and remove the temporary files after STAR exits.
+commands: `STAR-gz` for `STAR`, or `STARlong-gz` for `STARlong`. If you are
+using the portable ZIP package, run `.\STAR-gz.ps1` or `.\STARlong-gz.ps1`
+from the extracted folder instead. These wrappers temporarily decompress `.gz`
+files passed to `--genomeFastaFiles`, `--sjdbGTFfile`, or `--readFilesIn`, run
+STAR with the decompressed files, and remove the temporary files after STAR
+exits.
 Non-gzipped files can be used alongside gzipped files; they are passed to STAR
 unchanged.
 
@@ -123,7 +128,7 @@ lanes or chunks, combine them before running STAR; see
 
 ```powershell
 # Generate a genome index from gzipped and uncompressed input files.
-.\STAR-gz.ps1 --runThreadN 8 `
+STAR-gz --runThreadN 8 `
   --runMode genomeGenerate `
   --genomeDir .\genome_index `
   --genomeFastaFiles .\reference.fa.gz .\extra_reference.fa `
@@ -133,7 +138,7 @@ lanes or chunks, combine them before running STAR; see
 
 ```powershell
 # Map paired-end gzipped short reads.
-.\STAR-gz.ps1 --runThreadN 8 `
+STAR-gz --runThreadN 8 `
   --genomeDir .\genome_index `
   --readFilesIn .\reads_R1.fastq.gz .\reads_R2.fastq.gz `
   --outFileNamePrefix .\star_output\
@@ -143,16 +148,16 @@ Temporary decompressed files can be large. To place them on a specific drive,
 use `-TempDir`:
 
 ```powershell
-.\STAR-gz.ps1 -TempDir D:\star_tmp --runThreadN 8 `
+STAR-gz -TempDir D:\star_tmp --runThreadN 8 `
   --genomeDir .\genome_index `
   --readFilesIn .\reads_R1.fastq.gz .\reads_R2.fastq.gz `
   --outFileNamePrefix .\star_output\
 ```
 
-For long-read alignment, use `STARlong-gz.ps1` in the same way:
+For long-read alignment, use `STARlong-gz` in the same way:
 
 ```powershell
-.\STARlong-gz.ps1 --runThreadN 8 `
+STARlong-gz --runThreadN 8 `
   --genomeDir .\genome_index `
   --readFilesIn .\long_reads.fastq.gz `
   --outFileNamePrefix .\starlong_output\
@@ -197,12 +202,13 @@ goes through the same FIFO and temporary shell script path. If reads are split
 across lanes or chunks, combine them into one R1 file and one R2 file before
 running STAR.
 
-For gzipped input files, use `STAR-gz.ps1` or `STARlong-gz.ps1` instead of
-`--readFilesCommand`. These wrapper scripts avoid STAR's `--readFilesCommand`
-path by temporarily decompressing gzipped input files before running `STAR.exe`
-or `STARlong.exe`.
+For gzipped input files, use `STAR-gz` or `STARlong-gz` instead of
+`--readFilesCommand`. If you are using the portable ZIP package, use
+`.\STAR-gz.ps1` or `.\STARlong-gz.ps1` from the extracted folder. These wrapper
+scripts avoid STAR's `--readFilesCommand` path by temporarily decompressing
+gzipped input files before running STAR.
 
-In addition, `STAR-gz.ps1` and `STARlong-gz.ps1` can accept gzipped genome
+In addition, `STAR-gz` and `STARlong-gz` can accept gzipped genome
 FASTA and annotation GTF files for `--genomeFastaFiles` and `--sjdbGTFfile`.
 This is not supported directly by the original STAR command-line options.
 
