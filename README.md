@@ -8,7 +8,7 @@ The release archive includes pre-compiled STAR binaries that users can use witho
 <table align="center">
   <tr>
     <td align="center">
-      <a href="https://github.com/win-ngs/star-windows-build/releases/download/v2.7.11b-windows/win-ngs-STAR-2.7.11b-windows-x86_64-msys.msi"><strong>Download</strong></a>
+      <a href="https://github.com/win-ngs/star-windows-build/releases/download/v2.7.11b-windows/win-ngs-STAR-2.7.11b-windows-x86_64-msys.msi"><strong>Download Installer</strong></a> *see instructions below.
     </td>
   </tr>
 </table>
