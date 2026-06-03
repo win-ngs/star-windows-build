@@ -1,4 +1,4 @@
-# htslib License Information
+# htslib License Notes
 
 The STAR source tree vendors htslib under:
 

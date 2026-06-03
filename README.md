@@ -5,6 +5,10 @@
 This repository provides a STAR build that runs natively on Windows.
 The release archive includes pre-compiled STAR binaries that users can use without building from source.
 
+
+### <div style="text-align: center; font-size: 150%">[Click here to download](https://github.com/win-ngs/star-windows-build/releases/download/v2.7.11b-windows/win-ngs-STAR-2.7.11b-windows-x86_64-msys.msi)
+</div>
+
 This is **not an official STAR release**.  
 Official STAR repository: https://github.com/alexdobin/STAR
 
@@ -23,13 +27,25 @@ Prebuilt Windows binaries are available from the
 [Releases](https://github.com/win-ngs/star-windows-build/releases) page
 of this repository.
 
-Download the latest release archive, for example:
+Recommended installer:
 
 ```text
-star-2.7.11b-windows-x86_64-msys.zip
+win-ngs-STAR-2.7.11b-windows-x86_64-msys.msi
 ```
 
-After extracting the archive, you should see:
+Download the MSI file and double-click it to install STAR. The installer places
+STAR under `C:\Program Files\WinNGS\STAR` and adds `C:\Program Files\WinNGS\bin`
+to PATH. Open a new PowerShell window after installation, then run `STAR` or
+`STARlong`.
+
+If the MSI cannot be installed on your system, or if you prefer not to use an
+installer, download the portable ZIP package instead:
+
+```text
+win-ngs-STAR-2.7.11b-windows-x86_64-msys.zip
+```
+
+After extracting the ZIP archive, you should see:
 
 ```text
 star-2.7.11b-windows-x86_64-msys/
@@ -42,7 +58,6 @@ star-2.7.11b-windows-x86_64-msys/
   msys-stdc++-6.dll
   STAR-gz.ps1
   STARlong-gz.ps1
-  README.md
   LICENSE.md
   THIRD_PARTY_NOTICES.txt
   LICENSES/

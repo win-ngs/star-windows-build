@@ -73,7 +73,7 @@ License:
 
 Detailed note:
 
-  LICENSES/htslib/README.md
+  LICENSES/htslib/LICENSE_NOTES.md
 
 
 MSYS2

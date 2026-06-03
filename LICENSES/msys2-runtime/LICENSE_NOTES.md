@@ -1,4 +1,4 @@
-# msys2-runtime License Information
+# msys2-runtime License Notes
 
 The bundled `msys-2.0.dll` file is copied unmodified from the MSYS2-MSYS
 `msys2-runtime` package.
