@@ -2,7 +2,7 @@ STAR_DIR       := STAR
 BUILD_ROOT     := build
 BUILD_STAR     := $(BUILD_ROOT)/STAR
 BUILD_STARLONG := $(BUILD_ROOT)/STARlong
-DIST_DIR       := win_x86_64
+DIST_DIR       := dist
 
 COMMON_EXTRA := -DSHM_NORESERVE=0
 
@@ -29,7 +29,6 @@ dist: star starlong
 	mkdir -p $(DIST_DIR)
 	cp $(BUILD_STAR)/source/STAR.exe $(DIST_DIR)/
 	cp $(BUILD_STARLONG)/source/STARlong.exe $(DIST_DIR)/
-	cp STAR-gz.ps1 STARlong-gz.ps1 THIRD_PARTY_NOTICES.txt $(DIST_DIR)/
 
 clean:
 	rm -rf $(BUILD_ROOT) $(DIST_DIR)

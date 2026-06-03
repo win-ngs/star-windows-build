@@ -26,13 +26,13 @@ of this repository.
 Download the latest release archive, for example:
 
 ```text
-STAR-2.7.11b-windows-x86_64-msys.zip
+star-2.7.11b-windows-x86_64-msys.zip
 ```
 
 After extracting the archive, you should see:
 
 ```text
-star/
+star-2.7.11b-windows-x86_64-msys/
   STAR.exe
   STARlong.exe
   msys-2.0.dll
@@ -42,7 +42,10 @@ star/
   msys-stdc++-6.dll
   STAR-gz.ps1
   STARlong-gz.ps1
+  README.md
+  LICENSE.md
   THIRD_PARTY_NOTICES.txt
+  LICENSES/
 ```
 
 Keep the DLL files in the same folder as `STAR.exe` and `STARlong.exe`.
@@ -53,12 +56,12 @@ STAR is a command-line program; the examples below show a minimal Windows workfl
 For detailed usage and options, refer to the
 [official STAR documentation](https://github.com/alexdobin/STAR/blob/master/doc/STARmanual.pdf).
 
-Open PowerShell, then move into the extracted `star` folder before running STAR:
+Open PowerShell, then move into the extracted folder before running STAR:
 
 ```powershell
 # Replace this path with the folder where you extracted the ZIP file.
 # For example:
-cd C:\Users\your_name\Downloads\star
+cd C:\Users\your_name\Downloads\star-2.7.11b-windows-x86_64-msys
 ```
 
 Example short-read run:
@@ -196,8 +199,9 @@ These DLLs are required to run the MSYS2-MSYS build of `STAR.exe` and `STARlong.
 
 The DLLs are redistributed unmodified from MSYS2 packages.
 
-License information for these bundled DLLs is provided in
-[THIRD_PARTY_NOTICES.txt](THIRD_PARTY_NOTICES.txt).
+License information for these bundled DLLs is summarized in
+[THIRD_PARTY_NOTICES.txt](THIRD_PARTY_NOTICES.txt), with package-level details
+in [LICENSES/DLL_LICENSES.md](LICENSES/DLL_LICENSES.md).
 
 ## Build from source
 
@@ -234,15 +238,12 @@ Build both STAR and STARlong:
 make
 ```
 
-The build outputs and helper files will be copied to:
+The build outputs will be copied to:
 
 ```text
-win_x86_64/
+dist/
   STAR.exe
   STARlong.exe
-  STAR-gz.ps1
-  STARlong-gz.ps1
-  THIRD_PARTY_NOTICES.txt
 ```
 
 Clean build outputs:
@@ -300,7 +301,7 @@ The top-level `Makefile`:
 3. changes `-std=c++11` to `-std=gnu++11` in the copied Makefiles
 4. passes `-DSHM_NORESERVE=0` via `CXXFLAGSextra`
 5. builds `STAR` and `STARlong` separately
-6. copies the final executables and helper files to `win_x86_64/`
+6. copies the final executables to `dist/`
 
 Building `STAR` and `STARlong` in separate directories avoids mixing object files compiled with different build options.
 
@@ -315,6 +316,8 @@ https://github.com/alexdobin/STAR
 
 The release archive also includes MSYS2-MSYS runtime DLLs.  
 See [THIRD_PARTY_NOTICES.txt](THIRD_PARTY_NOTICES.txt) for third-party package and license information.
+Detailed DLL license metadata is provided in
+[LICENSES/DLL_LICENSES.md](LICENSES/DLL_LICENSES.md).
 
 ## Disclaimer
 

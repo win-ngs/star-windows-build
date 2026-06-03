@@ -1,138 +1,86 @@
-Third-Party Notices for STAR Windows Build
-=========================================
+Third-Party Notices for STAR 2.7.11b Windows MSYS2 Build
+========================================================
 
-This release archive includes prebuilt STAR executables and the MSYS2-MSYS
-runtime DLLs required to run them on Windows.
+This file summarizes third-party components included in the Windows release
+ZIP for this repository.
 
-STAR itself is distributed under the MIT License.
-Official STAR repository:
-https://github.com/alexdobin/STAR
-
-
-Bundled MSYS2-MSYS runtime DLLs
-===============================
-
-The following DLLs are included in this release archive:
-
-  msys-2.0.dll
-  msys-z.dll
-  msys-gcc_s-seh-1.dll
-  msys-gomp-1.dll
-  msys-stdc++-6.dll
-
-These DLLs are redistributed unmodified from MSYS2 packages.
+This is an informational notice file, not legal advice. Each third-party
+component remains under its own license terms.
 
 
-1. msys-2.0.dll
----------------
+Packaged runtime files
+----------------------
 
-Package:
-  msys2-runtime
+The release ZIP includes `STAR.exe`, `STARlong.exe`, PowerShell wrapper
+scripts, and runtime DLLs copied from an MSYS2-MSYS installation. Package
+ownership was checked with `pacman -Qo`, and package metadata was checked with
+`pacman -Qi`.
 
-Description:
-  POSIX emulation engine for Windows.
+Runtime DLL package summary:
 
-License:
-  GPL
+  DLL files                                      MSYS2 package     Version   License
+  msys-2.0.dll                                  msys2-runtime     3.6.9-1   GPL
+  msys-z.dll                                    zlib              1.3.2-1   custom zlib license
+  msys-gcc_s-seh-1.dll, msys-gomp-1.dll,
+  msys-stdc++-6.dll                             gcc-libs          15.2.0-1  GPL/LGPL components with GCC runtime exception
 
-MSYS2 package page:
-  https://packages.msys2.org/package/msys2-runtime?repo=msys
+The `LICENSES/` directory contains DLL-level license metadata for the runtime
+DLLs included in this ZIP:
 
-Source:
-  Please refer to the MSYS2 package page and source package for the
-  corresponding version of msys2-runtime.
+  LICENSES/DLL_LICENSES.md
 
 
-2. msys-z.dll
--------------
-
-Package:
-  zlib
-
-Description:
-  Compression library implementing the deflate compression method.
-
-License:
-  zlib license / custom, as listed by MSYS2
-
-MSYS2 package page:
-  https://packages.msys2.org/packages/zlib?variant=x86_64
+STAR
+----
 
 Upstream project:
-  https://www.zlib.net/
-
-Source:
-  Please refer to the MSYS2 package page and the upstream zlib project.
-
-
-3. msys-gcc_s-seh-1.dll
------------------------
-
-Package:
-  gcc-libs
-
-Description:
-  GCC runtime library.
+  https://github.com/alexdobin/STAR
 
 License:
-  GPL/LGPL components with the GCC Runtime Library Exception,
-  as listed by the MSYS2 gcc-libs package.
+  MIT
 
-MSYS2 package page:
-  https://packages.msys2.org/packages/gcc-libs?variant=x86_64
+The upstream STAR license text is included in:
 
-Upstream project:
-  https://gcc.gnu.org/
+  STAR/LICENSE
+  LICENSES/star/LICENSE
 
 
-4. msys-gomp-1.dll
-------------------
+opal
+----
 
-Package:
-  gcc-libs
+The STAR source tree vendors opal under:
 
-Description:
-  GNU OpenMP runtime library.
+  STAR/source/opal/
 
 License:
-  GPL/LGPL components with the GCC Runtime Library Exception,
-  as listed by the MSYS2 gcc-libs package.
+  MIT
 
-MSYS2 package page:
-  https://packages.msys2.org/packages/gcc-libs?variant=x86_64
+The opal license text is included in:
 
-Upstream project:
-  https://gcc.gnu.org/
+  LICENSES/opal/LICENSE
 
 
-5. msys-stdc++-6.dll
---------------------
+htslib
+------
 
-Package:
-  gcc-libs
+The STAR source tree vendors htslib under:
 
-Description:
-  GNU libstdc++ runtime library.
+  STAR/source/htslib/
 
 License:
-  GPL/LGPL components with the GCC Runtime Library Exception,
-  as listed by the MSYS2 gcc-libs package.
+  MIT/Expat-style notices for many files and BSD-style notices for CRAM-related
+  files, with additional file-local notices in individual source files.
 
-MSYS2 package page:
-  https://packages.msys2.org/packages/gcc-libs?variant=x86_64
+Detailed note:
 
-Upstream project:
-  https://gcc.gnu.org/
+  LICENSES/htslib/README.md
 
 
-Notes
-=====
+MSYS2
+-----
 
-The bundled DLLs are included only to make the MSYS2-MSYS build of STAR
-runnable on Windows systems without requiring users to manually locate these
-runtime libraries.
+The runtime DLLs listed above were copied from an MSYS2-MSYS installation.
+MSYS2 package metadata and license files were used to prepare this notice.
 
-No modifications are made to these DLLs in this release.
-
-For exact license terms, users should refer to the corresponding MSYS2
-package pages and upstream source packages.
+MSYS2 project:
+  https://www.msys2.org/
