@@ -6,8 +6,7 @@ This repository provides a STAR build that runs natively on Windows.
 The release archive includes pre-compiled STAR binaries that users can use without building from source.
 
 
-### <div style="text-align: center; font-size: 150%">[Click here to download](https://github.com/win-ngs/star-windows-build/releases/download/v2.7.11b-windows/win-ngs-STAR-2.7.11b-windows-x86_64-msys.msi)
-</div>
+### [Click here to download](https://github.com/win-ngs/star-windows-build/releases/download/v2.7.11b-windows/win-ngs-STAR-2.7.11b-windows-x86_64-msys.msi)
 
 This is **not an official STAR release**.  
 Official STAR repository: https://github.com/alexdobin/STAR
