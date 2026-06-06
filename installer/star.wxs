@@ -1,0 +1,47 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
+     xmlns:ui="http://wixtoolset.org/schemas/v4/wxs/ui">
+  <Package Name="WinNGS STAR"
+           Manufacturer="WinNGS"
+           Version="$(var.ProductVersion)"
+           UpgradeCode="{D21EAC62-6523-4B3D-BDD7-640934F17E3B}"
+           Scope="perMachine">
+    <MajorUpgrade DowngradeErrorMessage="A newer version of WinNGS STAR is already installed." />
+    <MediaTemplate EmbedCab="yes" />
+    <ui:WixUI Id="WixUI_Minimal" />
+    <WixVariable Id="WixUILicenseRtf" Value="$(var.InstallerLicenseRtf)" />
+    <Property Id="WIXUI_EXITDIALOGOPTIONALTEXT" Value="Installation completed successfully." />
+
+    <StandardDirectory Id="ProgramFiles64Folder">
+      <Directory Id="INSTALLFOLDER" Name="WinNGS-STAR" />
+    </StandardDirectory>
+
+    <Feature Id="MainFeature" Title="WinNGS STAR" Level="1">
+      <ComponentGroupRef Id="StarFiles" />
+      <ComponentGroupRef Id="PathComponents" />
+    </Feature>
+  </Package>
+
+  <Fragment>
+    <ComponentGroup Id="StarFiles" Directory="INSTALLFOLDER">
+      <Files Include="$(var.MsiRoot)\WinNGS-STAR\**" />
+    </ComponentGroup>
+
+    <ComponentGroup Id="PathComponents" Directory="INSTALLFOLDER">
+      <Component Id="AddWinNgsStarToPath" Guid="{F58F0C41-67AB-4E85-8334-F4D27289102D}">
+        <CreateFolder />
+        <RegistryValue Root="HKLM"
+                       Key="Software\WinNGS\STAR"
+                       Name="PathComponent"
+                       Type="integer"
+                       Value="1"
+                       KeyPath="yes" />
+        <Environment Id="AddWinNgsStarToPath"
+                     Name="PATH"
+                     Value="[INSTALLFOLDER]"
+                     Action="set"
+                     Part="last"
+                     System="yes" />
+      </Component>
+    </ComponentGroup>
+  </Fragment>
+</Wix>
