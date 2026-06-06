@@ -41,9 +41,16 @@ Download the MSI file and double-click it to install STAR. The installer places
 STAR under `C:\Program Files\WinNGS-STAR` and adds that folder to PATH. Open a
 new PowerShell window after installation, then run `STAR` or `STARlong`.
 
-If Windows shows a blue warning screen titled "Windows protected your PC", 
-click the **More info** link, then click the **Run anyway** button to continue 
-the installation.
+<table>
+  <tr>
+    <td>
+      <strong>Windows SmartScreen note</strong><br>
+      If Windows shows a blue warning screen titled "Windows protected your PC",
+      click the <strong>More info</strong> link, then click the
+      <strong>Run anyway</strong> button to continue the installation.
+    </td>
+  </tr>
+</table>
 
 If the MSI cannot be installed on your system, or if you prefer not to use an
 installer, download the portable ZIP package instead:
@@ -188,29 +195,83 @@ Observed runtimes:
 
 ## Limitations
 
-Do not use `--readFilesCommand` with this Windows release.
-
-STAR implements `--readFilesCommand` by creating POSIX FIFO files and temporary
-shell scripts, such as `gzip -cd "reads.fastq.gz" > FIFO`. This depends on
-Unix-style shell behavior and FIFO support, which are not reliable in the
-MSYS2-MSYS Windows build.
-
-Also avoid giving multiple FASTQ files for one mate as a comma-separated list,
-such as `--readFilesIn R1_L001.fastq,R1_L002.fastq R2_L001.fastq,R2_L002.fastq`.
-When multiple files are provided this way, STAR internally uses `cat`, which
-goes through the same FIFO and temporary shell script path. If reads are split
-across lanes or chunks, combine them into one R1 file and one R2 file before
-running STAR.
+These Windows binaries are intended for STAR workflows where the executable
+opens ordinary, uncompressed input files directly. Avoid STAR code paths that
+create POSIX FIFO files and launch helper commands through a Unix-like shell.
 
 For gzipped input files, use `STAR-gz` or `STARlong-gz` instead of
 `--readFilesCommand`. If you are using the portable ZIP package, use
 `.\STAR-gz.ps1` or `.\STARlong-gz.ps1` from the extracted folder. These wrapper
-scripts avoid STAR's `--readFilesCommand` path by temporarily decompressing
-gzipped input files before running STAR.
+scripts temporarily decompress gzipped input files before STAR sees them, so
+STAR can use its normal direct file-reading path. The wrappers support gzipped
+genome FASTA, annotation GTF, and FASTQ files passed to `--genomeFastaFiles`,
+`--sjdbGTFfile`, and `--readFilesIn`.
 
-In addition, `STAR-gz` and `STARlong-gz` can accept gzipped genome
-FASTA and annotation GTF files for `--genomeFastaFiles` and `--sjdbGTFfile`.
-This is not supported directly by the original STAR command-line options.
+Do not use the following with this Windows release:
+
+- `--readFilesCommand`, including commands such as `gzip -cd`, `zcat`, or
+  `samtools view -h`
+- comma-separated multiple input files for the same mate, such as
+  `--readFilesIn R1_L001.fastq,R1_L002.fastq R2_L001.fastq,R2_L002.fastq`
+- BAM read input via `--readFilesType SAM SE/PE` when it depends on
+  `--readFilesCommand samtools view -h`
+
+If reads are split across lanes or chunks, combine them into one R1 file and
+one R2 file before running STAR, or decompress/combine them outside STAR.
+
+### Developer details
+
+This limitation is not caused by gzip compression itself. It comes from the
+STAR source path that is enabled when `readFilesCommandString` is non-empty.
+In `STAR/source/Parameters_readFilesInit.cpp`, STAR sets
+`readFilesCommandString` when `--readFilesCommand` is provided. The same
+variable is also set to `cat` when a mate has multiple comma-separated input
+files, even if `--readFilesCommand` was not specified.
+
+Once `readFilesCommandString` is non-empty,
+`STAR/source/Parameters_openReadsFiles.cpp` switches from direct file reading
+to a helper-command pipeline. In that path, STAR:
+
+1. creates temporary POSIX FIFO files with `mkfifo()`
+2. probes each input file with `system("ls -lL ...")`
+3. writes temporary command scripts such as `readsCommand_read1`
+4. writes commands into those scripts, for example `gzip -cd "reads.fastq.gz"`
+   or `cat "R1_L001.fastq"`
+5. marks the scripts executable with `chmod()`
+6. starts them with `vfork()` and `execlp()`
+7. reads the resulting stream from the FIFO
+
+The generated command script may use `--sysShell` as its shebang, but the
+earlier `system("ls -lL ...")` call is not controlled by `--sysShell`.
+Therefore `--sysShell` can change how the generated `readsCommand_read1`
+script is launched, but it does not make the whole pipeline reliable in
+ordinary PowerShell sessions, whether STAR was installed from the MSI or
+extracted from the portable ZIP.
+
+In a full MSYS2-MSYS terminal, the required shell, FIFO implementation, and
+core utilities are provided by the same MSYS2 environment, so this path can
+work. In a normal PowerShell session, and in Git Bash with these MSYS2-linked
+STAR binaries, the STAR process may not see a compatible `/bin/sh`, `ls`,
+`gzip`, `cat`, and FIFO runtime. The result can be a hang rather than a clean
+error, because STAR waits for data from a FIFO whose producer process did not
+start correctly.
+
+### Related source paths
+
+- `STAR/source/Parameters_readSAMheader.cpp` uses `mkfifo()` and `system()` for
+  `--readFilesType SAM SE/PE` header handling when a read command is active.
+- `STAR/source/Parameters_closeReadsFiles.cpp` uses `kill(SIGKILL)` to stop
+  helper processes created for `readFilesCommandString`.
+- `STAR/source/htslib/cram/zfio.c` contains `popen()` calls for gzip-based
+  CRAM helper I/O when that htslib path is enabled.
+- `STAR/source/SoloFeature_outputResults.cpp` uses `symlink()` for part of the
+  STARsolo output path.
+- `STAR/source/SharedMemory.cpp` uses POSIX shared-memory APIs such as
+  `shm_open()` and `mmap()` for `--genomeLoad` modes other than
+  `NoSharedMemory`.
+
+The default `--genomeLoad NoSharedMemory` setting and ordinary direct reads of
+uncompressed FASTA, GTF, and FASTQ files avoid the FIFO/helper-command path.
 
 ## Runtime DLLs included in the release archive
 
