@@ -46,8 +46,8 @@ new PowerShell window after installation, then run `STAR` or `STARlong`.
     <td>
       <strong>Windows SmartScreen note</strong><br>
       If Windows shows a blue warning screen titled "Windows protected your PC",
-      click the <strong>More info</strong> link, then click the
-      <strong>Run anyway</strong> button to continue the installation.
+      click the <strong>"More info"</strong> link, then click the
+      <strong>"Run anyway"</strong> button to continue the installation.
     </td>
   </tr>
 </table>
