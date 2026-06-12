@@ -11,10 +11,11 @@ The MSI installs files under:
 C:\Program Files\WinNGS-STAR\
   STAR.exe
   STARlong.exe
-  STAR-gz.cmd
-  STARlong-gz.cmd
-  STAR-gz.ps1
-  STARlong-gz.ps1
+  STAR-win.cmd
+  STARlong-win.cmd
+  scripts\
+    STAR-win.ps1
+    STARlong-win.ps1
   MSYS2 runtime DLLs
   LICENSE.md
   THIRD_PARTY_NOTICES.txt

@@ -95,15 +95,25 @@ foreach ($item in (Get-ChildItem -LiteralPath $packageDir -Force)) {
     Copy-Item -LiteralPath $item.FullName -Destination $toolRoot -Recurse -Force
 }
 
-New-CmdLauncher -Path (Join-Path $toolRoot "STAR-gz.cmd") -Command @"
+New-CmdLauncher -Path (Join-Path $toolRoot "STAR-win.cmd") -Command @"
 @echo off
-powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%~dp0STAR-gz.ps1" %*
+where pwsh.exe >nul 2>nul
+if %ERRORLEVEL%==0 (
+  pwsh.exe -NoProfile -ExecutionPolicy Bypass -File "%~dp0scripts\STAR-win.ps1" %*
+) else (
+  powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%~dp0scripts\STAR-win.ps1" %*
+)
 exit /b %ERRORLEVEL%
 "@
 
-New-CmdLauncher -Path (Join-Path $toolRoot "STARlong-gz.cmd") -Command @"
+New-CmdLauncher -Path (Join-Path $toolRoot "STARlong-win.cmd") -Command @"
 @echo off
-powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%~dp0STARlong-gz.ps1" %*
+where pwsh.exe >nul 2>nul
+if %ERRORLEVEL%==0 (
+  pwsh.exe -NoProfile -ExecutionPolicy Bypass -File "%~dp0scripts\STARlong-win.ps1" %*
+) else (
+  powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%~dp0scripts\STARlong-win.ps1" %*
+)
 exit /b %ERRORLEVEL%
 "@
 

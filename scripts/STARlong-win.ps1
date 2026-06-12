@@ -1,10 +1,10 @@
 <#
 .SYNOPSIS
-Runs STARlong with gzipped FASTA/FASTQ/GTF files by temporarily decompressing them first.
+Runs STARlong on Windows after preparing gzipped or split input files.
 
 .DESCRIPTION
-This is a STARlong wrapper around STAR-gz.ps1. It uses STARlong.exe instead of
-STAR.exe while keeping the same temporary decompression behavior.
+This is the STARlong companion wrapper for STAR-win.ps1. It uses STARlong.exe instead of
+STAR.exe while keeping the same temporary file preparation behavior.
 #>
 
 [CmdletBinding()]
@@ -26,17 +26,19 @@ $scriptDir = if (-not [string]::IsNullOrWhiteSpace($PSScriptRoot)) {
     (Get-Location).Path
 }
 
-$wrapper = Join-Path $scriptDir "STAR-gz.ps1"
+$wrapper = Join-Path $scriptDir "STAR-win.ps1"
 $starLong = Join-Path $scriptDir "STARlong.exe"
 if (-not (Test-Path -LiteralPath $starLong -PathType Leaf)) {
-    $repoBuildPath = Join-Path $scriptDir "win_x86_64\STARlong.exe"
-    if (Test-Path -LiteralPath $repoBuildPath -PathType Leaf) {
-        $starLong = $repoBuildPath
+    foreach ($candidate in @("win_x86_64\STARlong.exe", "dist\STARlong.exe")) {
+        $candidatePath = Join-Path $scriptDir $candidate
+        if (Test-Path -LiteralPath $candidatePath -PathType Leaf) {
+            $starLong = $candidatePath
+            break
+        }
     }
 }
-
 if (-not (Test-Path -LiteralPath $wrapper -PathType Leaf)) {
-    throw "STAR-gz.ps1 was not found next to this script: $wrapper"
+    throw "STAR-win.ps1 was not found next to this script: $wrapper"
 }
 
 if (-not (Test-Path -LiteralPath $starLong -PathType Leaf)) {

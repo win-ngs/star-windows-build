@@ -17,29 +17,25 @@ This repository provides Windows executables for:
 
 built using [MSYS2 MSYS](https://www.msys2.org/docs/environments/).
 
-## Downloading STAR for Windows
+## Installing STAR for Windows
 
-Prebuilt Windows binaries are available from the
-[Releases](https://github.com/win-ngs/star-windows-build/releases) page
-of this repository.
+The recommended way to install STAR is Windows Package Manager (`winget`).
+Open PowerShell and run:
 
-Recommended installer:
-
-```text
-win-ngs-STAR-2.7.11b-windows-x86_64-msys.msi
+```powershell
+winget install WinNGS.STAR
 ```
 
-<table align="center">
-  <tr>
-    <td align="center">
-      <a href="https://github.com/win-ngs/star-windows-build/releases/download/v2.7.11b-windows/win-ngs-STAR-2.7.11b-windows-x86_64-msys.msi"><strong>Download Installer</strong></a> 
-    </td>
-  </tr>
-</table>
+The installer places STAR under `C:\Program Files\WinNGS-STAR` and adds that
+folder to PATH. Open a new PowerShell window after installation, then run
+`STAR` or `STARlong`.
 
-Download the MSI file and double-click it to install STAR. The installer places
-STAR under `C:\Program Files\WinNGS-STAR` and adds that folder to PATH. Open a
-new PowerShell window after installation, then run `STAR` or `STARlong`.
+Prebuilt MSI and ZIP packages are also available from the
+[Releases](https://github.com/win-ngs/star-windows-build/releases) page of this
+repository.
+
+If `winget` is not available on your system, download the MSI file from the
+Releases page and double-click it to install STAR.
 
 <table>
   <tr>
@@ -70,8 +66,11 @@ star-2.7.11b-windows-x86_64-msys/
   msys-gcc_s-seh-1.dll
   msys-gomp-1.dll
   msys-stdc++-6.dll
-  STAR-gz.ps1
-  STARlong-gz.ps1
+  STAR-win.cmd
+  STARlong-win.cmd
+  scripts/
+    STAR-win.ps1
+    STARlong-win.ps1
   LICENSE.md
   THIRD_PARTY_NOTICES.txt
   LICENSES/
@@ -85,7 +84,7 @@ STAR is a command-line program; the examples below show a minimal Windows workfl
 For detailed usage and options, refer to the
 [official STAR documentation](https://github.com/alexdobin/STAR/blob/master/doc/STARmanual.pdf).
 
-If you installed STAR with the MSI installer, open a new PowerShell window.
+If you installed STAR with `winget` or the MSI installer, open a new PowerShell window.
 The `STAR` and `STARlong` commands are available from any working directory:
 
 ```powershell
@@ -115,27 +114,32 @@ STAR --runThreadN 8 `
   --outFileNamePrefix .\star_output\
 ```
 
-## Working with gzipped input files
+## Working with gzipped or split input files
 
-The STAR binaries in this Windows release cannot read gzip-compressed input
-files directly; see [Limitations](#limitations). If your genome FASTA,
-annotation GTF, or FASTQ files are gzipped, use the included PowerShell wrapper
-commands: `STAR-gz` for `STAR`, or `STARlong-gz` for `STARlong`. If you are
-using the portable ZIP package, run `.\STAR-gz.ps1` or `.\STARlong-gz.ps1`
-from the extracted folder instead. These wrappers temporarily decompress `.gz`
-files passed to `--genomeFastaFiles`, `--sjdbGTFfile`, or `--readFilesIn`, run
-STAR with the decompressed files, and remove the temporary files after STAR
-exits.
-Non-gzipped files can be used alongside gzipped files; they are passed to STAR
-unchanged.
+Do not pass these inputs directly to `STAR.exe` or `STARlong.exe` from
+ordinary PowerShell:
 
-Use one FASTQ file per mate with these wrappers. If your reads are split across
-lanes or chunks, combine them before running STAR; see
-[Limitations](#limitations).
+- gzip-compressed genome FASTA, annotation GTF, or FASTQ files
+- multiple FASTQ files for the same mate, such as
+  `R1_L001.fastq,R1_L002.fastq`
+
+These inputs cannot be opened directly by STAR in this build; see [Limitations](#limitations).
+
+Use instead the included PowerShell wrapper commands for these cases: `STAR-win` for
+`STAR`, or `STARlong-win` for `STARlong`. With the portable ZIP package,
+run `.\STAR-win.cmd` or `.\STARlong-win.cmd` from the extracted folder.
+
+The wrappers support gzipped files passed to `--genomeFastaFiles`,
+`--sjdbGTFfile`, and `--readFilesIn`. Non-gzipped files can be used alongside
+gzipped files.
+
+For FASTQ files split across lanes or chunks, pass comma-separated
+`--readFilesIn` lists. `--readFilesManifest` is not supported by these
+wrappers.
 
 ```powershell
 # Generate a genome index from gzipped and uncompressed input files.
-STAR-gz --runThreadN 8 `
+STAR-win --runThreadN 8 `
   --runMode genomeGenerate `
   --genomeDir .\genome_index `
   --genomeFastaFiles .\reference.fa.gz .\extra_reference.fa `
@@ -145,26 +149,36 @@ STAR-gz --runThreadN 8 `
 
 ```powershell
 # Map paired-end gzipped short reads.
-STAR-gz --runThreadN 8 `
+STAR-win --runThreadN 8 `
   --genomeDir .\genome_index `
   --readFilesIn .\reads_R1.fastq.gz .\reads_R2.fastq.gz `
   --outFileNamePrefix .\star_output\
 ```
 
-Temporary decompressed files can be large. To place them on a specific drive,
-use `-TempDir`:
+```powershell
+# Map paired-end reads split across lanes.
+# Files for each mate are concatenated in the listed order.
+STAR-win --runThreadN 8 `
+  --genomeDir .\genome_index `
+  --readFilesIn .\R1_L001.fastq.gz,.\R1_L002.fastq.gz .\R2_L001.fastq.gz,.\R2_L002.fastq.gz `
+  --outFileNamePrefix .\star_output\
+```
+
+Temporary files can be large. `-TempDir` must have enough free space for the
+uncompressed and concatenated input files. To place temporary files on a
+specific drive, use `-TempDir`:
 
 ```powershell
-STAR-gz -TempDir D:\star_tmp --runThreadN 8 `
+STAR-win -TempDir D:\star_tmp --runThreadN 8 `
   --genomeDir .\genome_index `
   --readFilesIn .\reads_R1.fastq.gz .\reads_R2.fastq.gz `
   --outFileNamePrefix .\star_output\
 ```
 
-For long-read alignment, use `STARlong-gz` in the same way:
+For long-read alignment, use `STARlong-win` in the same way:
 
 ```powershell
-STARlong-gz --runThreadN 8 `
+STARlong-win --runThreadN 8 `
   --genomeDir .\genome_index `
   --readFilesIn .\long_reads.fastq.gz `
   --outFileNamePrefix .\starlong_output\
@@ -184,53 +198,54 @@ Validation environment:
 
 Test data:
 
-- Genome FASTA: `GRCh38.primary_assembly.genome.fa`
+- Genome FASTA: `GRCh38.p14.genome.fa`
 - Annotation GTF: `gencode.v49.primary_assembly.annotation.gtf`
 - Mapping input: `SRR33370091` (~20 million reads, 150 bp paired-end)
 
 Observed runtimes:
 
-- Genome index generation: **31 min 31 sec**.
-- Mapping, including sorted-by-coordinate BAM output: **3 min 4 sec (426.12 million reads/hour)**
+- Genome index generation: **50 min**.
+- Mapping, including sorted-by-coordinate BAM output: **3 min 18 sec**.
 
 ## Limitations
 
 These Windows binaries are intended for STAR workflows where the executable
-opens ordinary, uncompressed input files directly. Avoid STAR code paths that
-create POSIX FIFO files and launch helper commands through a Unix-like shell.
+opens ordinary input files directly. Avoid STAR code paths that create POSIX
+FIFO files and launch helper commands through a Unix-like shell.
 
-For gzipped input files, use `STAR-gz` or `STARlong-gz` instead of
-`--readFilesCommand`. If you are using the portable ZIP package, use
-`.\STAR-gz.ps1` or `.\STARlong-gz.ps1` from the extracted folder. These wrapper
-scripts temporarily decompress gzipped input files before STAR sees them, so
-STAR can use its normal direct file-reading path. The wrappers support gzipped
-genome FASTA, annotation GTF, and FASTQ files passed to `--genomeFastaFiles`,
-`--sjdbGTFfile`, and `--readFilesIn`.
+For gzipped or split FASTQ input files, use `STAR-win` or `STARlong-win`
+instead of `--readFilesCommand`. With the portable ZIP package, use
+`.\STAR-win.cmd` or `.\STARlong-win.cmd` from the extracted folder. These wrapper
+scripts prepare temporary files before STAR sees them, so STAR can use its
+normal direct file-reading path. They do not require an external `gzip.exe`.
+The wrappers support gzipped genome FASTA, annotation GTF, and FASTQ files
+passed to `--genomeFastaFiles`, `--sjdbGTFfile`, and `--readFilesIn`. They also
+support comma-separated `--readFilesIn` lists by concatenating each mate into
+one temporary FASTQ file.
 
-Do not use the following with this Windows release:
+Do not use the following in ordinary PowerShell workflows:
 
 - `--readFilesCommand`, including commands such as `gzip -cd`, `zcat`, or
   `samtools view -h`
 - comma-separated multiple input files for the same mate, such as
-  `--readFilesIn R1_L001.fastq,R1_L002.fastq R2_L001.fastq,R2_L002.fastq`
+  `--readFilesIn R1_L001.fastq,R1_L002.fastq R2_L001.fastq,R2_L002.fastq`;
+  use `STAR-win` or `STARlong-win` for this case
+- `--readFilesManifest` with `STAR-win` or `STARlong-win`; these wrappers do not
+  read or rewrite manifest files
 - BAM read input via `--readFilesType SAM SE/PE` when it depends on
   `--readFilesCommand samtools view -h`
 
-If reads are split across lanes or chunks, combine them into one R1 file and
-one R2 file before running STAR, or decompress/combine them outside STAR.
-
 ### Developer details
 
-This limitation is not caused by gzip compression itself. It comes from the
-STAR source path that is enabled when `readFilesCommandString` is non-empty.
-In `STAR/source/Parameters_readFilesInit.cpp`, STAR sets
-`readFilesCommandString` when `--readFilesCommand` is provided. The same
-variable is also set to `cat` when a mate has multiple comma-separated input
-files, even if `--readFilesCommand` was not specified.
+The fragile path is controlled by `readFilesCommandString` in
+`STAR/source/Parameters_readFilesInit.cpp`. STAR sets this string when
+`--readFilesCommand` is provided. It also sets it to `cat` when `readFilesN > 1`,
+which happens with comma-separated `--readFilesIn` and with multi-row
+`--readFilesManifest`.
 
 Once `readFilesCommandString` is non-empty,
-`STAR/source/Parameters_openReadsFiles.cpp` switches from direct file reading
-to a helper-command pipeline. In that path, STAR:
+`STAR/source/Parameters_openReadsFiles.cpp` switches from direct file reading to
+a helper-command pipeline. In that path, STAR:
 
 1. creates temporary POSIX FIFO files with `mkfifo()`
 2. probes each input file with `system("ls -lL ...")`
@@ -241,12 +256,20 @@ to a helper-command pipeline. In that path, STAR:
 6. starts them with `vfork()` and `execlp()`
 7. reads the resulting stream from the FIFO
 
-The generated command script may use `--sysShell` as its shebang, but the
-earlier `system("ls -lL ...")` call is not controlled by `--sysShell`.
-Therefore `--sysShell` can change how the generated `readsCommand_read1`
-script is launched, but it does not make the whole pipeline reliable in
-ordinary PowerShell sessions, whether STAR was installed from the MSI or
-extracted from the portable ZIP.
+`--sysShell` can affect the generated command script shebang, but it does not
+control the earlier `system("ls -lL ...")` call. Therefore it does not make the
+whole helper-command pipeline reliable in ordinary PowerShell sessions.
+
+Manifest-specific notes:
+
+- STAR opens the manifest file itself as ordinary text, so `--readFilesCommand`
+  does not decompress `manifest.tsv.gz`.
+- Manifest rows may point to `.fastq.gz` files, but that still depends on
+  `--readFilesCommand`, which is the unsupported helper-command path here.
+- Manifest rows can carry per-file read groups. STAR preserves those through
+  `readFilesIndex`; pre-concatenating manifest inputs would lose that per-file
+  association. For this reason, the wrappers do not implement partial manifest
+  support.
 
 In a full MSYS2-MSYS terminal, the required shell, FIFO implementation, and
 core utilities are provided by the same MSYS2 environment, so this path can
@@ -302,18 +325,6 @@ Install [**MSYS2**](https://www.msys2.org/), then open the **MSYS2-MSYS** termin
 Use the **MSYS2-MSYS** environment, **not MSYS2-UCRT64** or any other
 MSYS2 environment.
 
-Update MSYS2:
-
-```bash
-pacman -Syu
-```
-
-If MSYS2 asks you to close the terminal, close it, reopen **MSYS2-MSYS**, and run again:
-
-```bash
-pacman -Syu
-```
-
 Install the required build tools:
 
 ```bash
@@ -331,7 +342,7 @@ make
 The build outputs will be copied to:
 
 ```text
-dist/
+win_x86_64/
   STAR.exe
   STARlong.exe
 ```
@@ -390,8 +401,9 @@ The top-level `Makefile`:
 2. copies `STAR/` to `build/STARlong/`
 3. changes `-std=c++11` to `-std=gnu++11` in the copied Makefiles
 4. passes `-DSHM_NORESERVE=0` via `CXXFLAGSextra`
-5. builds `STAR` and `STARlong` separately
-6. copies the final executables to `dist/`
+5. passes `BUILD_PLACE=WinNGS` to avoid embedding a local build path
+6. builds `STAR` and `STARlong` separately
+7. copies the final executables to `win_x86_64/`
 
 Building `STAR` and `STARlong` in separate directories avoids mixing object files compiled with different build options.
 
