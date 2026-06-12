@@ -1,7 +1,7 @@
 [CmdletBinding()]
 param(
     [string] $VersionLabel = "2.7.11b",
-    [string] $ProductVersion = "2.7.11",
+    [string] $ProductVersion = "2.7.11.2",
     [string] $PackageFolderName = "star-2.7.11b-windows-x86_64-msys",
     [string] $OutputName = "win-ngs-STAR-2.7.11b-windows-x86_64-msys.msi",
     [string] $Culture = "en-US",

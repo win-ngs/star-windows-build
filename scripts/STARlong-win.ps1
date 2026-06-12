@@ -25,16 +25,20 @@ $scriptDir = if (-not [string]::IsNullOrWhiteSpace($PSScriptRoot)) {
 } else {
     (Get-Location).Path
 }
+$packageDir = Split-Path -Parent $scriptDir
 
 $wrapper = Join-Path $scriptDir "STAR-win.ps1"
 $starLong = Join-Path $scriptDir "STARlong.exe"
 if (-not (Test-Path -LiteralPath $starLong -PathType Leaf)) {
-    foreach ($candidate in @("win_x86_64\STARlong.exe", "dist\STARlong.exe")) {
-        $candidatePath = Join-Path $scriptDir $candidate
-        if (Test-Path -LiteralPath $candidatePath -PathType Leaf) {
-            $starLong = $candidatePath
-            break
+    foreach ($baseDir in @($scriptDir, $packageDir)) {
+        foreach ($candidate in @("STARlong.exe", "win_x86_64\STARlong.exe", "dist\STARlong.exe")) {
+            $candidatePath = Join-Path $baseDir $candidate
+            if (Test-Path -LiteralPath $candidatePath -PathType Leaf) {
+                $starLong = [System.IO.Path]::GetFullPath($candidatePath)
+                break
+            }
         }
+        if (Test-Path -LiteralPath $starLong -PathType Leaf) { break }
     }
 }
 if (-not (Test-Path -LiteralPath $wrapper -PathType Leaf)) {

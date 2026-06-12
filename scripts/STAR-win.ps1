@@ -28,6 +28,7 @@ $script:ScriptDir = if (-not [string]::IsNullOrWhiteSpace($PSScriptRoot)) {
 } else {
     (Get-Location).Path
 }
+$script:PackageDir = Split-Path -Parent $script:ScriptDir
 
 if ([string]::IsNullOrWhiteSpace($StarExe)) {
     $StarExe = Join-Path $script:ScriptDir "STAR.exe"
@@ -42,7 +43,7 @@ Usage:
   .\STAR-win.ps1 [wrapper options] --runMode genomeGenerate --genomeDir .\genome_index --genomeFastaFiles .\reference.fa.gz --sjdbGTFfile .\annotation.gtf.gz
 
 Wrapper options:
-  -StarExe <path>   Path to STAR.exe. Defaults to STAR.exe next to this script.
+  -StarExe <path>   Path to STAR.exe. Defaults to STAR.exe next to this script or its parent folder.
   -TempDir <path>   Directory under which temporary files are created.
   -KeepTemp         Keep temporary files after STAR exits.
 
@@ -54,12 +55,15 @@ function Resolve-StarExecutable {
     param([string]$Path)
     $resolved = [System.IO.Path]::GetFullPath($Path)
     if (-not (Test-Path -LiteralPath $resolved -PathType Leaf) -and [System.IO.Path]::GetFileName($Path) -eq "STAR.exe") {
-        foreach ($candidate in @("win_x86_64\STAR.exe", "dist\STAR.exe")) {
-            $candidatePath = Join-Path $script:ScriptDir $candidate
-            if (Test-Path -LiteralPath $candidatePath -PathType Leaf) {
-                $resolved = [System.IO.Path]::GetFullPath($candidatePath)
-                break
+        foreach ($baseDir in @($script:ScriptDir, $script:PackageDir)) {
+            foreach ($candidate in @("STAR.exe", "win_x86_64\STAR.exe", "dist\STAR.exe")) {
+                $candidatePath = Join-Path $baseDir $candidate
+                if (Test-Path -LiteralPath $candidatePath -PathType Leaf) {
+                    $resolved = [System.IO.Path]::GetFullPath($candidatePath)
+                    break
+                }
             }
+            if (Test-Path -LiteralPath $resolved -PathType Leaf) { break }
         }
     }
     if (-not (Test-Path -LiteralPath $resolved -PathType Leaf)) { throw "STAR executable was not found: $resolved" }
